@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Рационал сандарға амалдар қолдану</title>
+  
+  <!-- QR-код генераторы -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <!-- MathJax формулалар үшін -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['[', ']']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      
+      --pos-color: #16a34a; /* Оң сандар - Жасыл */
+      --neg-color: #dc2626; /* Теріс сандар - Қызыл */
+      
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 12px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      text-align: center;
+      position: relative;
+      padding: 10px 0;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .header-controls {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .circle-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+
+    /* Навигациялық Табтар */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+      flex: 0 0 auto;
+      background: white;
+      border: 2px solid #cbd5e1;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Секциялар */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Теориялық анықтама карточкасы */
+    .theory-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 6px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .theory-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    /* Түстермен кодинг сыныптары */
+    .pos { color: var(--pos-color); font-weight: bold; }
+    .neg { color: var(--neg-color); font-weight: bold; }
+
+    /* Шпаргалка блогы */
+    .cheat-sheet {
+      background: #eff6ff;
+      border: 1px dashed var(--primary);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    .cheat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .cheat-item {
+      background: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* Тренажер және тапсырмалар */
+    .trainer-section {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    .controls-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .count-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    select.select-cnt {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-weight: bold;
+      color: var(--primary);
+      background: white;
+      outline: none;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      min-height: 40px;
+      padding: 0 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+
+    .btn:active {
+      opacity: 0.85;
+    }
+
+    .btn-gen {
+      background: #2563eb;
+    }
+
+    .btn-check {
+      background: #059669;
+    }
+
+    .task-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .task-expr {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .task-input {
+      width: 120px;
+      height: 44px;
+      font-size: 1.1rem;
+      text-align: center;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      font-weight: bold;
+    }
+
+    .task-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Брендинг */
+    .author-badge {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #34495e;
+      background: #eaeded;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin: 10px auto 0 auto;
+    }
+
+    /* Модальды терезе */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .social-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .social-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .social-qr {
+      width: 70px;
+      height: 70px;
+      background: white;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.3rem; }
+      .task-card { flex-direction: column; align-items: flex-start; }
+      .task-input { width: 100%; }
+      .controls-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Рационал сандарға амалдар қолдану</h1>
+    <p class="subtitle">Бүтін және ондық бөлшек сандармен жұмыс істеу</p>
+    
+    <div class="header-controls">
+      <button class="circle-btn" onclick="toggleSocials(true)">📱</button>
+    </div>
+  </header>
+
+  <!-- Навигациялық Табтар -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab(1)">1. Ұқсас таңбалар</button>
+    <button class="tab-btn" onclick="switchTab(2)">2. Әртүрлі таңбалар</button>
+    <button class="tab-btn" onclick="switchTab(3)">3. Жақшаны ашу</button>
+    <button class="tab-btn" onclick="switchTab(4)">4. Тиімді тәсіл</button>
+    <button class="tab-btn" onclick="switchTab(5)">5. Көбейту мен Бөлу</button>
+    <button class="tab-btn" onclick="switchTab(6)">6. Жалпы Тренажер</button>
+  </div>
+
+  <!-- ==================== 1-ТАБ: Ұқсас таңбалар ==================== -->
+  <div class="tab-content active" id="tab1">
+    <div class="theory-card">
+      <h3>📌 1-Ереже: Бірдей таңбалы сандарды қосу ($3,2 + 4,5$ және $-3,2 - 4,5$)</h3>
+      <p>Таңбалары бірдей сандарды қосқанда, олардың модульдерін қосып, алдына <b>ортақ таңбаны</b> қоямыз:</p>
+      <ul>
+        <li><span class="pos">+3,2</span> + <span class="pos">4,5</span> = <span class="pos">+7,7</span></li>
+        <li><span class="neg">-3,2</span> - <span class="neg">4,5</span> = -(3,2 + 4,5) = <span class="neg">-7,7</span></li>
+      </ul>
+    </div>
+
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect1">Мысалдар саны:</label>
+          <select id="cntSelect1" class="select-cnt" onchange="generateTab(1)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(1)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(1)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab1"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 2-ТАБ: Әртүрлі таңбалар ==================== -->
+  <div class="tab-content" id="tab2">
+    <div class="theory-card">
+      <h3>📌 2-Ереже: Әртүрлі таңбалы сандарды қосу ($-4,2 + 7,5$ және $4,2 - 7,5$)</h3>
+      <p>Таңбалары әртүрлі сандарды қосқанда, модульдері үлкен саннан кішісін азайтып, алдына <b>модулі үлкен санның таңбасын</b> қоямыз:</p>
+      <ul>
+        <li><span class="neg">-4,2</span> + <span class="pos">7,5</span> = +(7,5 - 4,2) = <span class="pos">+3,3</span></li>
+        <li><span class="pos">4,2</span> - <span class="neg">7,5</span> = -(7,5 - 4,2) = <span class="neg">-3,3</span></li>
+      </ul>
+    </div>
+
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect2">Мысалдар саны:</label>
+          <select id="cntSelect2" class="select-cnt" onchange="generateTab(2)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(2)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(2)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab2"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 3-ТАБ: Жақшаны ашу ==================== -->
+  <div class="tab-content" id="tab3">
+    <div class="theory-card">
+      <h3>📌 3-Ереже: Таңбалардың түйісуі және жақшаны ашу</h3>
+      <p>Жақшаның алдындағы және ішіндегі таңбалар түйіскенде:</p>
+      <div class="cheat-sheet">
+        <b>Шпаргалка:</b>
+        <div class="cheat-grid">
+          <div class="cheat-item">+ (-a) = -a</div>
+          <div class="cheat-item">- (-a) = +a</div>
+        </div>
+      </div>
+      <p style="margin-top:10px;"><b>Мысалдар:</b></p>
+      <ul>
+        <li><span class="neg">-4,5</span> + (<span class="neg">-2,3</span>) = <span class="neg">-4,5</span> - <span class="pos">2,3</span> = <span class="neg">-6,8</span></li>
+        <li><span class="neg">-4,5</span> - (<span class="neg">-2,3</span>) = <span class="neg">-4,5</span> + <span class="pos">2,3</span> = <span class="neg">-2,2</span></li>
+      </ul>
+    </div>
+
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect3">Мысалдар саны:</label>
+          <select id="cntSelect3" class="select-cnt" onchange="generateTab(3)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(3)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(3)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 4-ТАБ: Тиімді тәсіл ==================== -->
+  <div class="tab-content" id="tab4">
+    <div class="theory-card">
+      <h3>📌 4-Ереже: Тиімді тәсілмен есептеу (Топтастыру)</h3>
+      <p>Өрнекті жылдам есептеу үшін оң сандарды өз алдына, теріс сандарды өз алдына топтастырып алған ыңғайлы:</p>
+      <p style="margin-top:8px;"><b>Мысал:</b> <span class="neg">-4,5</span> + <span class="pos">2,1</span> - <span class="neg">5,5</span></p>
+      <ul>
+        <li>Теріс сандарды біріктіреміз: (<span class="neg">-4,5</span> - <span class="neg">5,5</span>) = <span class="neg">-10</span></li>
+        <li>Оң санды қосамыз: <span class="neg">-10</span> + <span class="pos">2,1</span> = <span class="neg">-7,9</span></li>
+      </ul>
+    </div>
+
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect4">Мысалдар саны:</label>
+          <select id="cntSelect4" class="select-cnt" onchange="generateTab(4)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(4)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(4)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab4"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 5-ТАБ: Көбейту мен Бөлу ==================== -->
+  <div class="tab-content" id="tab5">
+    <div class="theory-card">
+      <h3>📌 5-Ереже: Көбейту және Бөлу кезіндегі таңбалар</h3>
+      <div class="cheat-sheet">
+        <b>Жақшадағы таңбалар ережесі (Көбейту / Бөлу):</b>
+        <div class="cheat-grid">
+          <div class="cheat-item"><span class="neg">(-)</span> $\cdot$ <span class="neg">(-)</span> = <span class="pos">(+)</span></div>
+          <div class="cheat-item"><span class="pos">(+)</span> $\cdot$ <span class="pos">(+)</span> = <span class="pos">(+)</span></div>
+          <div class="cheat-item"><span class="neg">(-)</span> $\cdot$ <span class="pos">(+)</span> = <span class="neg">(-)</span></div>
+          <div class="cheat-item"><span class="pos">(+)</span> $\cdot$ <span class="neg">(-)</span> = <span class="neg">(-)</span></div>
+        </div>
+      </div>
+      <p style="margin-top:10px;"><b>Мысалдар:</b></p>
+      <ul>
+        <li>(<span class="neg">-0,4</span>) $\cdot$ (<span class="neg">-2,5</span>) = <span class="pos">+1</span></li>
+        <li>(<span class="neg">-1,2</span>) : (<span class="pos">0,3</span>) = <span class="neg">-4</span></li>
+      </ul>
+    </div>
+
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect5">Мысалдар саны:</label>
+          <select id="cntSelect5" class="select-cnt" onchange="generateTab(5)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(5)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(5)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab5"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 6-ТАБ: Жалпы Тренажер ==================== -->
+  <div class="tab-content" id="tab6">
+    <div class="trainer-section">
+      <div class="controls">
+        <div class="count-selector">
+          <label for="cntSelect6">Мысалдар саны:</label>
+          <select id="cntSelect6" class="select-cnt" onchange="generateTab(6)">
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button class="btn btn-gen" onclick="generateTab(6)">Жаңа есептер</button>
+          <button class="btn btn-check" onclick="checkTab(6)">Тексеру</button>
+        </div>
+      </div>
+      <div id="containerTab6"></div>
+    </div>
+  </div>
+
+  <!-- Брендинг -->
+  <div class="author-badge" onclick="toggleSocials(true)">
+    <span>👩‍🏫</span>
+    <span>Автор: Diana_S.B.</span>
+  </div>
+</div>
+
+<!-- Модальды терезе -->
+<div class="modal" id="socialModal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:12px;">Байланыс және Әлеуметтік желілер 📱</h3>
+    <div class="social-grid">
+      <div class="social-item">
+        <canvas class="social-qr" id="qrInsta1"></canvas>
+        <div>
+          <p style="font-weight:bold; font-size:0.9rem;">Instagram (Негізгі)</p>
+          <a href="https://www.instagram.com/diane._____?igsh=MjFqeWl2NWtnazFv" target="_blank" style="color:#3498db; font-size:0.85rem; font-weight:bold;">Өту</a>
+        </div>
+      </div>
+      <div class="social-item">
+        <canvas class="social-qr" id="qrInsta2"></canvas>
+        <div>
+          <p style="font-weight:bold; font-size:0.9rem;">Instagram (Математика)</p>
+          <a href="https://www.instagram.com/diana_s.b_math_teacher?igsh=aHAxenN0eWV4cTZl" target="_blank" style="color:#2ecc71; font-size:0.85rem; font-weight:bold;">Өту</a>
+        </div>
+      </div>
+      <div class="social-item">
+        <canvas class="social-qr" id="qrYoutube"></canvas>
+        <div>
+          <p style="font-weight:bold; font-size:0.9rem;">YouTube Канал</p>
+          <a href="https://youtube.com/@dianasemenova-e3q?si=xY_-dsDHnZ_BRKDE" target="_blank" style="color:#e74c3c; font-size:0.85rem; font-weight:bold;">Өту</a>
+        </div>
+      </div>
+    </div>
+    <button class="btn" style="width:100%; margin-top:15px; background:#64748b;" onclick="toggleSocials(false)">Жабу</button>
+  </div>
+</div>
+
+<script>
+  function toggleSocials(show) {
+    document.getElementById('socialModal').style.display = show ? 'flex' : 'none';
+    if (show) {
+      new QRious({ element: document.getElementById('qrInsta1'), value: 'https://www.instagram.com/diane._____?igsh=MjFqeWl2NWtnazFv', size: 140 });
+      new QRious({ element: document.getElementById('qrInsta2'), value: 'https://www.instagram.com/diana_s.b_math_teacher?igsh=aHAxenN0eWV4cTZl', size: 140 });
+      new QRious({ element: document.getElementById('qrYoutube'), value: 'https://youtube.com/@dianasemenova-e3q?si=xY_-dsDHnZ_BRKDE', size: 140 });
+    }
+  }
+
+  function switchTab(num) {
+    document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+      btn.classList.toggle('active', idx === (num - 1));
+    });
+    document.querySelectorAll('.tab-content').forEach((cnt, idx) => {
+      cnt.classList.toggle('active', idx === (num - 1));
+    });
+  }
+
+  let activeData = {};
+
+  // Санды пішімдеу (үтірмен көрсету)
+  function fmt(num) {
+    return num.toString().replace('.', ',');
+  }
+
+  // Кездейсоқ бүтін немесе ондық бөлшек генерациялау
+  function getRandomNumber(max, allowDecimal = true) {
+    const isDec = allowDecimal && Math.random() > 0.4;
+    if (isDec) {
+      const val = (Math.floor(Math.random() * max * 10) + 1) / 10;
+      return parseFloat(val.toFixed(1));
+    }
+    return Math.floor(Math.random() * max) + 1;
+  }
+
+  // Тапсырмалар генерациясы
+  function generateTab(tabNum) {
+    const cntSelect = document.getElementById(`cntSelect${tabNum}`);
+    const count = cntSelect ? parseInt(cntSelect.value, 10) : 10;
+    const container = document.getElementById(`containerTab${tabNum}`);
+    container.innerHTML = '';
+    
+    const key = `tab${tabNum}`;
+    activeData[key] = [];
+
+    for (let i = 0; i < count; i++) {
+      let item = createRandomTask(tabNum);
+      activeData[key].push(item);
+
+      const card = document.createElement('div');
+      card.className = 'task-card';
+      card.innerHTML = `
+        <div class="task-expr">${item.html} = </div>
+        <input type="text" inputmode="decimal" class="task-input" id="${key}_${i}">
+      `;
+      container.appendChild(card);
+    }
+
+    if (window.MathJax) MathJax.typesetPromise([container]);
+  }
+
+  function createRandomTask(tabNum) {
+    let mode = tabNum;
+    if (tabNum === 6) {
+      mode = Math.floor(Math.random() * 5) + 1;
+    }
+
+    if (mode === 1) {
+      // Ұқсас таңбалар
+      const isPos = Math.random() > 0.5;
+      const a = getRandomNumber(15);
+      const b = getRandomNumber(15);
+      if (isPos) {
+        return { html: `<span class="pos">${fmt(a)}</span> + <span class="pos">${fmt(b)}</span>`, ans: parseFloat((a + b).toFixed(1)) };
+      } else {
+        return { html: `<span class="neg">-${fmt(a)}</span> - <span class="neg">${fmt(b)}</span>`, ans: parseFloat((-a - b).toFixed(1)) };
+      }
+    } else if (mode === 2) {
+      // Әртүрлі таңбалар
+      const a = getRandomNumber(20);
+      const b = getRandomNumber(20);
+      if (Math.random() > 0.5) {
+        return { html: `<span class="neg">-${fmt(a)}</span> + <span class="pos">${fmt(b)}</span>`, ans: parseFloat((-a + b).toFixed(1)) };
+      } else {
+        return { html: `<span class="pos">${fmt(a)}</span> - <span class="neg">${fmt(b)}</span>`, ans: parseFloat((a - b).toFixed(1)) };
+      }
+    } else if (mode === 3) {
+      // Жақшаны ашу
+      const aRaw = getRandomNumber(15);
+      const a = aRaw * (Math.random() > 0.5 ? 1 : -1);
+      const b = getRandomNumber(15);
+      const isPlus = Math.random() > 0.5;
+      
+      const spanA = a > 0 ? `<span class="pos">${fmt(a)}</span>` : `<span class="neg">${fmt(a)}</span>`;
+      if (isPlus) {
+        return { html: `${spanA} + (<span class="neg">-${fmt(b)}</span>)`, ans: parseFloat((a - b).toFixed(1)) };
+      } else {
+        return { html: `${spanA} - (<span class="neg">-${fmt(b)}</span>)`, ans: parseFloat((a + b).toFixed(1)) };
+      }
+    } else if (mode === 4) {
+      // Тиімді тәсіл
+      const a = getRandomNumber(10);
+      const b = getRandomNumber(10);
+      const c = getRandomNumber(10);
+      return { 
+        html: `<span class="neg">-${fmt(a)}</span> + <span class="pos">${fmt(b)}</span> - <span class="neg">${fmt(c)}</span>`, 
+        ans: parseFloat((-a + b - c).toFixed(1)) 
+      };
+    } else {
+      // Көбейту мен Бөлу
+      const isMult = Math.random() > 0.5;
+      const aSign = Math.random() > 0.5 ? 1 : -1;
+      const bSign = Math.random() > 0.5 ? 1 : -1;
+      
+      if (isMult) {
+        const a = getRandomNumber(8, true) * aSign;
+        const b = getRandomNumber(5, true) * bSign;
+        const spanA = a > 0 ? `<span class="pos">${fmt(a)}</span>` : `<span class="neg">${fmt(a)}</span>`;
+        const spanB = b > 0 ? `<span class="pos">${fmt(b)}</span>` : `<span class="neg">${fmt(b)}</span>`;
+        return { html: `(${spanA}) $\\cdot$ (${spanB})`, ans: parseFloat((a * b).toFixed(2)) };
+      } else {
+        const b = (Math.floor(Math.random() * 8) + 2) * bSign;
+        const ans = getRandomNumber(6, true) * aSign;
+        const a = parseFloat((b * ans).toFixed(1));
+        const spanA = a > 0 ? `<span class="pos">${fmt(a)}</span>` : `<span class="neg">${fmt(a)}</span>`;
+        const spanB = b > 0 ? `<span class="pos">${fmt(b)}</span>` : `<span class="neg">${fmt(b)}</span>`;
+        return { html: `(${spanA}) : (${spanB})`, ans: parseFloat(ans.toFixed(1)) };
+      }
+    }
+  }
+
+  function checkTab(tabNum) {
+    const key = `tab${tabNum}`;
+
+    if (!activeData[key]) return;
+
+    activeData[key].forEach((t, idx) => {
+      const inp = document.getElementById(`${key}_${idx}`);
+      if (inp) {
+        const val = parseFloat(inp.value.replace(',', '.').trim());
+        if (!isNaN(val) && Math.abs(val - t.ans) < 0.05) {
+          inp.style.borderColor = '#10b981';
+        } else {
+          inp.style.borderColor = '#ef4444';
+        }
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    for (let i = 1; i <= 6; i++) {
+      generateTab(i);
+    }
+  });
+</script>
+
+</body>
+</html>
